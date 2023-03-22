@@ -41,6 +41,17 @@ class PngBuilder:
 
 		pngBytesNearlyOK.extend(IDAT)
 
+
+		authorValue = "gegelascience"
+		
+		tEXt = ['','','','']
+		tEXt[1] = u'tEXt'.encode('ascii')
+		tEXt[2] = struct.pack('>6sB' + str(len(authorValue)) + 's' ,'Author'.encode('latin1'),0,authorValue.encode('latin1'))
+		tEXt[0] = struct.pack('>I', len(tEXt[2]))
+		tEXt[3] = struct.pack('>I', zlib.crc32(tEXt[2], zlib.crc32(struct.pack('>4s', u'tEXt'.encode('ascii')))))
+
+		pngBytesNearlyOK.extend(tEXt)
+
 		# IEND
 		IEND = ['', '', '', '']
 		IEND[1] = u'IEND'.encode('ascii')
