@@ -71,7 +71,13 @@ class PngBuilder:
 		if keyword not in listAcceptedKeyword:
 			raise Exception("Invalid keyword, "  + keyword + " not supported")
 		self.__tEXtChunks.append(PngChunkBuilder(u'tEXt',struct.pack('>6sB' + str(len(data)) + 's' ,keyword.encode('latin1'),0,data.encode('latin1'))))
-		
+
+	def removelastIDATChunk(self):
+		self.__IDATChunks.pop()	
+	
+	def removelasttExtChunk(self):
+		self.__tEXtChunks.pop()	
+
 
 	def getFileByteContent(self):
 		byteContentList: list[bytes] = []
