@@ -57,7 +57,7 @@ class PngBuilder:
 		# IEND chunk
 		self.__IENDChunk=PngChunkBuilder(u'IEND',"")
 
-	def addIDATChunk(self,data:list):
+	def addIDATChunk(self,data:list[list[tuple]]):
 		image = []
 
 		for ligne in data:
