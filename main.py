@@ -26,6 +26,7 @@ if __name__ == "__main__":
 	pngBuilder = PngBuilder(32,32,ColorType.RGBA )
 	pngBuilder.addIDATChunk(test)
 	pngBuilder.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
+	pngBuilder.addtEXtChunk(TextKeyword.SOFTWARE,"python 3")
 	pngBuilder.writeFile("test.png")
 
 

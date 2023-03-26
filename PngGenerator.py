@@ -1,12 +1,13 @@
 import zlib
 import struct
-from enum import Enum
+from enum import Enum, IntEnum, unique
 
-
-class ColorType(Enum):
+@unique
+class ColorType(IntEnum):
     RGB = 2
     RGBA = 6
-    
+
+@unique
 class TextKeyword(Enum):
 	TITLE = "Title"
 	AUTHOR = "Author"
@@ -44,7 +45,7 @@ class PngBuilder:
 		
 		# IDHR
 		# profondeur 8 bits, rbga (6)
-		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType.value, 0, 0, 0))
+		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
@@ -56,7 +57,7 @@ class PngBuilder:
 		# IEND chunk
 		self.__IENDChunk=PngChunkBuilder(u'IEND',"")
 
-	def addIDATChunk(self,data):
+	def addIDATChunk(self,data:list):
 		image = []
 
 		for ligne in data:
