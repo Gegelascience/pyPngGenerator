@@ -1,4 +1,4 @@
-from PngGenerator import PngBuilder, ColorType
+from PngGenerator import PngBuilder, ColorType, TextKeyword
 
 if __name__ == "__main__":
 
@@ -25,7 +25,7 @@ if __name__ == "__main__":
 
 	pngBuilder = PngBuilder(32,32,ColorType.RGBA )
 	pngBuilder.addIDATChunk(test)
-	pngBuilder.addtEXtChunk("Author","gegelascience")
+	pngBuilder.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder.writeFile("test.png")
 
 
@@ -47,7 +47,7 @@ if __name__ == "__main__":
 
 	pngBuilder2 = PngBuilder(32,32,ColorType.RGB)
 	pngBuilder2.addIDATChunk(test2)
-	pngBuilder2.addtEXtChunk("Author","gegelascience")
+	pngBuilder2.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder2.writeFile("test2.png")
 
 	

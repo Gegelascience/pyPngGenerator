@@ -6,6 +6,18 @@ from enum import Enum
 class ColorType(Enum):
     RGB = 2
     RGBA = 6
+    
+class TextKeyword(Enum):
+	TITLE = "Title"
+	AUTHOR = "Author"
+	DESC = "Description"
+	COPYRIGHT = "Copyright"
+	CreaTime = "Creation Time"
+	SOFTWARE = "Software"
+	DISCLAMER = "Disclaimer"
+	WARNING = "Warning"
+	SOURCE ="Source"
+	COMMENT = "Comment"
 
 class PngChunkBuilder:
 
@@ -59,24 +71,8 @@ class PngBuilder:
 		self.__IDATChunks.append(PngChunkBuilder(u'IDAT',image_compressee))
 
 
-	def addtEXtChunk(self,keyword:str,data:str):
-
-		listAcceptedKeyword = [
-			"Title",
-			"Author",
-			"Description",
-			"Copyright",
-			"Creation Time",
-			"Software",
-			"Disclaimer",
-			"Warning",
-			"Source",
-			"Comment"
-		]
-
-		if keyword not in listAcceptedKeyword:
-			raise Exception("Invalid keyword, "  + keyword + " not supported")
-		self.__tEXtChunks.append(PngChunkBuilder(u'tEXt',struct.pack('>6sB' + str(len(data)) + 's' ,keyword.encode('latin1'),0,data.encode('latin1'))))
+	def addtEXtChunk(self,keyword:TextKeyword,data:str):
+		self.__tEXtChunks.append(PngChunkBuilder(u'tEXt',struct.pack('>' + str(len(keyword.value)) +  'sB' + str(len(data)) + 's' ,str(keyword.value).encode('latin1'),0,data.encode('latin1'))))
 
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
