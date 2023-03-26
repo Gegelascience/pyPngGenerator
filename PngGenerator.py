@@ -1,5 +1,11 @@
 import zlib
 import struct
+from enum import Enum
+
+
+class ColorType(Enum):
+    RGB = 2
+    RGBA = 6
 
 class PngChunkBuilder:
 
@@ -19,14 +25,14 @@ class PngChunkBuilder:
 
 class PngBuilder:
 
-	def __init__(self,height:int, width:int) -> None:
+	def __init__(self,height:int, width:int, colorType:ColorType) -> None:
 		
 		# magic number
 		self.__magicNumber = struct.pack('>BBBBBBBB', 137, 80, 78, 71, 13, 10, 26,10)
 		
 		# IDHR
 		# profondeur 8 bits, rbga (6)
-		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, 6, 0, 0, 0))
+		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType.value, 0, 0, 0))
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []

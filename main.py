@@ -1,4 +1,4 @@
-from PngGenerator import PngBuilder
+from PngGenerator import PngBuilder, ColorType
 
 if __name__ == "__main__":
 
@@ -23,7 +23,7 @@ if __name__ == "__main__":
 		row+=1
 
 
-	pngBuilder = PngBuilder(32,32)
+	pngBuilder = PngBuilder(32,32,ColorType.RGBA )
 	pngBuilder.addIDATChunk(test)
 	pngBuilder.addtEXtChunk("Author","gegelascience")
 	pngBuilder.writeFile("test.png")
@@ -38,14 +38,14 @@ if __name__ == "__main__":
 		while col < 32:
 			if row > 2 and row <29 and (col in [4,5,6,25,26,27] or ((col==row or col == row+1 or col == row-1) and col > 3 and col <28)):
 
-				rowData.append([255,255,255,255])
+				rowData.append([255,255,255])
 			else:
-				rowData.append([255,0,0,255])
+				rowData.append([255,0,0])
 			col+=1
 		test2.append(rowData)	
 		row+=1
 
-	pngBuilder2 = PngBuilder(32,32)
+	pngBuilder2 = PngBuilder(32,32,ColorType.RGB)
 	pngBuilder2.addIDATChunk(test2)
 	pngBuilder2.addtEXtChunk("Author","gegelascience")
 	pngBuilder2.writeFile("test2.png")
