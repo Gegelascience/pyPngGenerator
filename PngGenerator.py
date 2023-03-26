@@ -4,7 +4,9 @@ from enum import Enum, IntEnum, unique
 
 @unique
 class ColorType(IntEnum):
+    GRAYSCALE = 0
     RGB = 2
+    GRAYSCALEALPHA = 4
     RGBA = 6
 
 @unique
@@ -46,6 +48,9 @@ class PngBuilder:
 		# IDHR
 		# profondeur 8 bits, rbga (6)
 		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
+
+
+		# PLTE chunk (todo)
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
