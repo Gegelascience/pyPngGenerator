@@ -23,7 +23,9 @@ if __name__ == "__main__":
 		row+=1
 
 
-	pngBuilder = PngBuilder(test,32,32)
+	pngBuilder = PngBuilder(32,32)
+	pngBuilder.addIDATChunk(test)
+	pngBuilder.addtEXtChunk("Author","gegelascience")
 	pngBuilder.writeFile("test.png")
 
 
@@ -34,7 +36,7 @@ if __name__ == "__main__":
 		col = 0
 		rowData = []
 		while col < 32:
-			if row > 2 and row <29 and (col in [4,5,6,25,26,27] or col==row or col == row+1 or col == row-1):
+			if row > 2 and row <29 and (col in [4,5,6,25,26,27] or ((col==row or col == row+1 or col == row-1) and col > 3 and col <28)):
 
 				rowData.append([255,255,255,255])
 			else:
@@ -43,5 +45,9 @@ if __name__ == "__main__":
 		test2.append(rowData)	
 		row+=1
 
-	pngBuilder = PngBuilder(test2,32,32)
-	pngBuilder.writeFile("test2.png")
+	pngBuilder2 = PngBuilder(32,32)
+	pngBuilder2.addIDATChunk(test2)
+	pngBuilder2.addtEXtChunk("Author","gegelascience")
+	pngBuilder2.writeFile("test2.png")
+
+	
