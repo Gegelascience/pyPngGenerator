@@ -6,6 +6,7 @@ from enum import Enum, IntEnum, unique
 class ColorType(IntEnum):
     GRAYSCALE = 0
     RGB = 2
+    COLORPALLETTE= 3
     GRAYSCALEALPHA = 4
     RGBA = 6
 
@@ -29,6 +30,8 @@ class PngChunkBuilder:
 		if chunkName != "IEND":
 			self.__chunkData = data
 			self.__chunkDataLen = struct.pack('>I', len(data))
+			if chunkName =="PLTE" and len(data)%3 !=0:
+				raise Exception("invalid palette data")
 		else:
 			self.__chunkData= "".encode()
 			self.__chunkDataLen =struct.pack('>I', 0)
@@ -51,6 +54,10 @@ class PngBuilder:
 
 
 		# PLTE chunk (todo)
+		self.__PLTEChunk = None
+		self.__mandatoryPlte = False
+		if colorType == ColorType.COLORPALLETTE:
+			self.__mandatoryPlte = True
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
@@ -66,13 +73,14 @@ class PngBuilder:
 		image = []
 
 		for ligne in data:
-			image.append(0)
+			image.append(struct.pack('>B', 0))
 			ligneInt = []
 			for pixel in ligne:
-				ligneInt.extend(pixel)
+				for color in pixel:
+					ligneInt.append(struct.pack('>B', color))
 			image.extend(ligneInt)
 
-		image_compressee = zlib.compress(bytearray(image))
+		image_compressee = zlib.compress(b"".join(image))
 
 		self.__IDATChunks.append(PngChunkBuilder(u'IDAT',image_compressee))
 
@@ -80,6 +88,14 @@ class PngBuilder:
 	def addtEXtChunk(self,keyword:TextKeyword,data:str):
 		self.__tEXtChunks.append(PngChunkBuilder(u'tEXt',struct.pack('>' + str(len(keyword.value)) +  'sB' + str(len(data)) + 's' ,str(keyword.value).encode('latin1'),0,data.encode('latin1'))))
 
+	
+	def setPLTEChunk(self,paletteData:list[tuple]):
+		listEntries = []
+		for entry in paletteData:
+			for color in entry:
+				listEntries.append(struct.pack('>B', color))
+		self.__PLTEChunk = PngChunkBuilder(u'PLTE', b"".join(listEntries))
+	
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
 	
@@ -92,6 +108,13 @@ class PngBuilder:
 
 		byteContentList.append(self.__magicNumber)
 		byteContentList.append(self.__IDHRChunk.getBytesContent())
+
+		if self.__PLTEChunk:
+			byteContentList.append(self.__PLTEChunk.getBytesContent())
+
+		if self.__mandatoryPlte and not self.__PLTEChunk:
+			raise Exception("PLTE chunk missing")
+
 		byteContentList.extend([iData.getBytesContent() for iData in self.__IDATChunks])
 		byteContentList.extend([txtChunk.getBytesContent() for txtChunk in self.__tEXtChunks])
 		byteContentList.append(self.__IENDChunk.getBytesContent())
