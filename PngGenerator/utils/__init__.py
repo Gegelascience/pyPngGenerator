@@ -1,1 +1,1 @@
-from PngGenerator.utils.enumHelper import ColorType, TextKeyword
+from .enumHelper import ColorType, TextKeyword

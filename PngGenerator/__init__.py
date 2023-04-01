@@ -1,2 +1,2 @@
-from PngGenerator.utils import ColorType, TextKeyword
-from PngGenerator.pngGenerator import PngBuilder
+from .utils import ColorType, TextKeyword
+from .pngGenerator import PngBuilder
