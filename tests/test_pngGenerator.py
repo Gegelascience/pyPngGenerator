@@ -1,6 +1,5 @@
 import unittest
 from PngGenerator import PngBuilder, ColorType
-import struct
 
 class PngBuilderRGBTestCase(unittest.TestCase):
 

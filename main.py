@@ -1,8 +1,30 @@
 from PngGenerator import PngBuilder, ColorType, TextKeyword
 
-if __name__ == "__main__":
+def createRGBPng(filename):
+	test2 = []
 
-	# RGBA
+	row =0
+	while row < 32:
+		col = 0
+		rowData = []
+		while col < 32:
+			if row > 2 and row <29 and (col in [4,5,6,25,26,27] or ((col==row or col == row+1 or col == row-1) and col > 3 and col <28)):
+
+				rowData.append([255,255,255])
+			else:
+				rowData.append([255,0,0])
+			col+=1
+		test2.append(rowData)	
+		row+=1
+
+	pngBuilder2 = PngBuilder(32,32,ColorType.RGB)
+	pngBuilder2.addIDATChunk(test2)
+	pngBuilder2.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
+	pngBuilder2.writeFile(filename)
+
+
+
+def createRGBAPng(filename):
 	test= []
 
 	row =0
@@ -28,32 +50,10 @@ if __name__ == "__main__":
 	pngBuilder.addIDATChunk(test)
 	pngBuilder.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder.addtEXtChunk(TextKeyword.SOFTWARE,"python 3")
-	pngBuilder.writeFile("test.png")
+	pngBuilder.writeFile(filename)
 
 
-	# RGB
-	test2 = []
-
-	row =0
-	while row < 32:
-		col = 0
-		rowData = []
-		while col < 32:
-			if row > 2 and row <29 and (col in [4,5,6,25,26,27] or ((col==row or col == row+1 or col == row-1) and col > 3 and col <28)):
-
-				rowData.append([255,255,255])
-			else:
-				rowData.append([255,0,0])
-			col+=1
-		test2.append(rowData)	
-		row+=1
-
-	pngBuilder2 = PngBuilder(32,32,ColorType.RGB)
-	pngBuilder2.addIDATChunk(test2)
-	pngBuilder2.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
-	pngBuilder2.writeFile("test2.png")
-
-	# Palette
+def createPaletteRGBPng(filename):
 
 	test3 = []
 
@@ -88,4 +88,9 @@ if __name__ == "__main__":
 	pngBuilder3.setPLTEChunk(paletteData)
 	
 	pngBuilder3.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
-	pngBuilder3.writeFile("test3.png")
+	pngBuilder3.writeFile(filename)
+
+if __name__ == "__main__":
+	createRGBPng("test.png")
+	createRGBAPng("test2.png")
+	createPaletteRGBPng("test3.png")
