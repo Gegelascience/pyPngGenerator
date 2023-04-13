@@ -19,6 +19,8 @@ def createRGBPng(filename):
 
 	pngBuilder2 = PngBuilder(32,32,ColorType.RGB)
 	pngBuilder2.addIDATChunk(test2)
+	pngBuilder2.settRNSChunk([255,255,255])
+
 	pngBuilder2.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder2.writeFile(filename)
 
@@ -64,6 +66,10 @@ def createPaletteRGBPng(filename):
 		(255,255,255)
 	]
 
+	transparencyIndex = [
+		255,0,0,255
+	]
+
 	row =0
 	while row < 32:
 		col = 0
@@ -86,11 +92,13 @@ def createPaletteRGBPng(filename):
 	pngBuilder3 = PngBuilder(32,32,ColorType.COLORPALLETTE)
 	pngBuilder3.addIDATChunk(test3)
 	pngBuilder3.setPLTEChunk(paletteData)
+
+	pngBuilder3.settRNSChunk(transparencyIndex)
 	
 	pngBuilder3.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder3.writeFile(filename)
 
 if __name__ == "__main__":
-	createRGBPng("test.png")
-	createRGBAPng("test2.png")
-	createPaletteRGBPng("test3.png")
+	createRGBPng("testRGB.png")
+	createRGBAPng("testRGBA.png")
+	createPaletteRGBPng("testPaletteRGB.png")

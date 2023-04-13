@@ -34,15 +34,18 @@ class PngBuilder:
 		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
 
 
-		# PLTE chunk (todo)
+		# PLTE chunk
 		self.__PLTEChunk = None
 		self.__mandatoryPlte = False
+		self.__colorType = colorType
 		if colorType == ColorType.COLORPALLETTE:
 			self.__mandatoryPlte = True
 
+		# tRNS chunk
+		self.__tRNSChunk = None
+
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
-
 
 		# tEXt chunks init
 		self.__tEXtChunks:list[PngChunkBuilder] = []		
@@ -72,10 +75,31 @@ class PngBuilder:
 	
 	def setPLTEChunk(self,paletteData:list[tuple]):
 		listEntries = []
+		if self.__colorType == ColorType.GRAYSCALE or self.__colorType == ColorType.GRAYSCALEALPHA:
+			raise Exception("PLTE invalid with grayscale modes")
+		
 		for entry in paletteData:
 			for color in entry:
 				listEntries.append(struct.pack('>B', color))
 		self.__PLTEChunk = PngChunkBuilder(u'PLTE', b"".join(listEntries))
+
+	
+	def settRNSChunk(self,chunkData:list):
+		listEntries = []
+		if self.__colorType == ColorType.GRAYSCALEALPHA or self.__colorType == ColorType.RGBA:
+			raise Exception("tRNS invalid with alpha data in IDAT chunks")
+		
+		if self.__colorType == ColorType.COLORPALLETTE:
+			for indexTransparency in chunkData:
+				listEntries.append(struct.pack('>B', indexTransparency))
+
+		
+		elif self.__colorType == ColorType.GRAYSCALE or self.__colorType == ColorType.RGB:
+			for colorTransparency in chunkData:
+				listEntries.append(struct.pack('>h', colorTransparency))
+
+
+		self.__tRNSChunk = PngChunkBuilder(u'tRNS', b"".join(listEntries))
 	
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
@@ -95,6 +119,9 @@ class PngBuilder:
 
 		if self.__mandatoryPlte and not self.__PLTEChunk:
 			raise Exception("PLTE chunk missing")
+		
+		if self.__tRNSChunk:
+			byteContentList.append(self.__tRNSChunk.getBytesContent())
 
 		byteContentList.extend([iData.getBytesContent() for iData in self.__IDATChunks])
 		byteContentList.extend([txtChunk.getBytesContent() for txtChunk in self.__tEXtChunks])
