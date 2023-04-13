@@ -48,7 +48,10 @@ class PngBuilder:
 		self.__IDATChunks:list[PngChunkBuilder] = []
 
 		# tEXt chunks init
-		self.__tEXtChunks:list[PngChunkBuilder] = []		
+		self.__tEXtChunks:list[PngChunkBuilder] = []
+
+		# zTxt chunk init
+		self.__zTXtChunks:list[PngChunkBuilder] = []
 
 		# IEND chunk
 		self.__IENDChunk=PngChunkBuilder(u'IEND',"")
@@ -72,6 +75,11 @@ class PngBuilder:
 	def addtEXtChunk(self,keyword:TextKeyword,data:str):
 		self.__tEXtChunks.append(PngChunkBuilder(u'tEXt',struct.pack('>' + str(len(keyword.value)) +  'sB' + str(len(data)) + 's' ,str(keyword.value).encode('latin1'),0,data.encode('latin1'))))
 
+	def addzTXtChunk(self,keyword:TextKeyword,data:str):
+		keywordAndNullCharBinary = struct.pack('>' + str(len(keyword.value)) +  'sBB',str(keyword.value).encode('latin1'),0,0)
+		dataCompress = zlib.compress(data.encode('latin1'))
+		print(len(dataCompress))
+		self.__zTXtChunks.append(PngChunkBuilder(u'zTXt',b"".join([keywordAndNullCharBinary, dataCompress])))
 	
 	def setPLTEChunk(self,paletteData:list[tuple]):
 		listEntries = []
@@ -107,6 +115,9 @@ class PngBuilder:
 	def removelasttExtChunk(self):
 		self.__tEXtChunks.pop()	
 
+	def removelastzTxtChunk(self):
+		self.__zTXtChunks.pop()	
+
 
 	def getFileByteContent(self):
 		byteContentList: list[bytes] = []
@@ -125,6 +136,7 @@ class PngBuilder:
 
 		byteContentList.extend([iData.getBytesContent() for iData in self.__IDATChunks])
 		byteContentList.extend([txtChunk.getBytesContent() for txtChunk in self.__tEXtChunks])
+		byteContentList.extend([ztxtChunk.getBytesContent() for ztxtChunk in self.__zTXtChunks])
 		byteContentList.append(self.__IENDChunk.getBytesContent())
 
 		return b"".join(byteContentList)
