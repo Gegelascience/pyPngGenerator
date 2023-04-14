@@ -2,6 +2,7 @@ import zlib
 import struct
 from datetime import datetime
 from PngGenerator import ColorType, TextKeyword
+import math
 
 
 class PngChunkBuilder:
@@ -46,6 +47,9 @@ class PngBuilder:
 
 		# bKGD chunk init
 		self.__bKGDChunk = None
+
+		# cHRM chunk init
+		self.__cHRMChunk = None
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
@@ -124,6 +128,19 @@ class PngBuilder:
 			listEntries.append(struct.pack('>B', chunkData[0]))
 
 		self.__bKGDChunk = PngChunkBuilder(u'bKGD', b"".join(listEntries))
+
+	def setcHRMChunk(self, xWhite:float,yWhite:float,xRed:float,yRed:float, xGreen:float, yGreen:float, xBlue:float, yBlue:float):
+		listOriginalCoord = [xWhite,yWhite,xRed,yRed, xGreen, yGreen, xBlue, yBlue]
+		listFormatedCoord = []
+		for coord in listOriginalCoord:
+			if coord <= 1 and coord >= 0:
+				listFormatedCoord.append(struct.pack('>I', math.trunc(coord*100000)))
+			else:
+				raise Exception("Invalid Chromatic Coordonate, must be between 0 and 1")
+			
+		self.__cHRMChunk = PngChunkBuilder(u'cHRM', b"".join(listFormatedCoord))
+
+		
 	
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
@@ -145,6 +162,9 @@ class PngBuilder:
 
 		byteContentList.append(self.__magicNumber)
 		byteContentList.append(self.__IDHRChunk.getBytesContent())
+
+		if self.__cHRMChunk:
+			byteContentList.append(self.__cHRMChunk.getBytesContent())
 
 		if self.__PLTEChunk:
 			byteContentList.append(self.__PLTEChunk.getBytesContent())
