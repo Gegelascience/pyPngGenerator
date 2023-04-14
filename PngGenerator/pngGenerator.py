@@ -1,6 +1,6 @@
 import zlib
 import struct
-
+from datetime import datetime
 from PngGenerator import ColorType, TextKeyword
 
 
@@ -47,6 +47,9 @@ class PngBuilder:
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
 
+		#tIME chunk init
+		self.__tIMEChunk = None
+
 		# tEXt chunks init
 		self.__tEXtChunks:list[PngChunkBuilder] = []
 
@@ -54,7 +57,7 @@ class PngBuilder:
 		self.__zTXtChunks:list[PngChunkBuilder] = []
 
 		# IEND chunk
-		self.__IENDChunk=PngChunkBuilder(u'IEND',"")
+		self.__IENDChunk=PngChunkBuilder(u'IEND',b"")
 
 	def addIDATChunk(self,data:list[list[tuple]]):
 		image = []
@@ -78,7 +81,6 @@ class PngBuilder:
 	def addzTXtChunk(self,keyword:TextKeyword,data:str):
 		keywordAndNullCharBinary = struct.pack('>' + str(len(keyword.value)) +  'sBB',str(keyword.value).encode('latin1'),0,0)
 		dataCompress = zlib.compress(data.encode('latin1'))
-		print(len(dataCompress))
 		self.__zTXtChunks.append(PngChunkBuilder(u'zTXt',b"".join([keywordAndNullCharBinary, dataCompress])))
 	
 	def setPLTEChunk(self,paletteData:list[tuple]):
@@ -122,6 +124,11 @@ class PngBuilder:
 	def getFileByteContent(self):
 		byteContentList: list[bytes] = []
 
+		now = datetime.now()
+		now.year
+		byteTime = struct.pack('>hBBBBB', now.year,now.month, now.day, now.hour, now.minute, now.second)
+		self.__tIMEChunk = PngChunkBuilder(u'tIME', byteTime)
+
 		byteContentList.append(self.__magicNumber)
 		byteContentList.append(self.__IDHRChunk.getBytesContent())
 
@@ -135,6 +142,9 @@ class PngBuilder:
 			byteContentList.append(self.__tRNSChunk.getBytesContent())
 
 		byteContentList.extend([iData.getBytesContent() for iData in self.__IDATChunks])
+
+		byteContentList.append(self.__tIMEChunk.getBytesContent())
+
 		byteContentList.extend([txtChunk.getBytesContent() for txtChunk in self.__tEXtChunks])
 		byteContentList.extend([ztxtChunk.getBytesContent() for ztxtChunk in self.__zTXtChunks])
 		byteContentList.append(self.__IENDChunk.getBytesContent())
