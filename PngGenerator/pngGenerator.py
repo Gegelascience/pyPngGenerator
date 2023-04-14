@@ -51,6 +51,9 @@ class PngBuilder:
 		# cHRM chunk init
 		self.__cHRMChunk = None
 
+		# gAMA chunk init
+		self.__gAMAChunk = None
+
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
 
@@ -140,7 +143,13 @@ class PngBuilder:
 			
 		self.__cHRMChunk = PngChunkBuilder(u'cHRM', b"".join(listFormatedCoord))
 
-		
+	def setgAMAChunk(self,gamaValue:float):
+		if gamaValue <= 1 and gamaValue >= 0:
+				formatedGamma = struct.pack('>I', math.trunc(gamaValue*100000))
+		else:
+			raise Exception("Invalid Gamma, must be between 0 and 1")
+		self.__gAMAChunk = PngChunkBuilder(u'gAMA', formatedGamma)
+
 	
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
@@ -165,6 +174,9 @@ class PngBuilder:
 
 		if self.__cHRMChunk:
 			byteContentList.append(self.__cHRMChunk.getBytesContent())
+
+		if self.__gAMAChunk:
+			byteContentList.append(self.__gAMAChunk.getBytesContent())
 
 		if self.__PLTEChunk:
 			byteContentList.append(self.__PLTEChunk.getBytesContent())

@@ -56,6 +56,7 @@ def createRGBAPng(filename):
 	pngBuilder = PngBuilder(32,32,ColorType.RGBA )
 	pngBuilder.addIDATChunk(test)
 	pngBuilder.setcHRMChunk(0,0,0.5,0.5,0.8,0.8,0.2,0.2)
+	pngBuilder.setgAMAChunk(0.45)
 	pngBuilder.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder.addtEXtChunk(TextKeyword.SOFTWARE,"python 3")
 	pngBuilder.writeFile(filename)
