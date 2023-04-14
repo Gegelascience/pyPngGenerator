@@ -21,6 +21,8 @@ def createRGBPng(filename):
 	pngBuilder2.addIDATChunk(test2)
 	pngBuilder2.settRNSChunk([255,255,255])
 
+	pngBuilder2.setbKGDChunk([0,0,255])
+
 	pngBuilder2.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder2.addzTXtChunk(TextKeyword.COMMENT,"Ceci est un commentaire")
 	pngBuilder2.writeFile(filename)

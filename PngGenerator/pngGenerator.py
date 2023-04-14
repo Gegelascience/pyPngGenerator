@@ -41,8 +41,11 @@ class PngBuilder:
 		if colorType == ColorType.COLORPALLETTE:
 			self.__mandatoryPlte = True
 
-		# tRNS chunk
+		# tRNS chunk init
 		self.__tRNSChunk = None
+
+		# bKGD chunk init
+		self.__bKGDChunk = None
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
@@ -110,6 +113,17 @@ class PngBuilder:
 
 
 		self.__tRNSChunk = PngChunkBuilder(u'tRNS', b"".join(listEntries))
+
+
+	def setbKGDChunk(self,chunkData:list):
+		listEntries = []
+		if self.__colorType != ColorType.COLORPALLETTE:
+			for entry in chunkData:
+				listEntries.append(struct.pack('>h', entry))
+		else:
+			listEntries.append(struct.pack('>B', chunkData[0]))
+
+		self.__bKGDChunk = PngChunkBuilder(u'bKGD', b"".join(listEntries))
 	
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
@@ -140,6 +154,9 @@ class PngBuilder:
 		
 		if self.__tRNSChunk:
 			byteContentList.append(self.__tRNSChunk.getBytesContent())
+
+		if self.__bKGDChunk:
+			byteContentList.append(self.__bKGDChunk.getBytesContent())
 
 		byteContentList.extend([iData.getBytesContent() for iData in self.__IDATChunks])
 
