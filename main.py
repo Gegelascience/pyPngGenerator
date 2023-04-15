@@ -73,6 +73,10 @@ def createPaletteRGBPng(filename):
 		(255,255,255)
 	]
 
+	histoData = [
+		8,8,8,8
+	]
+
 	transparencyIndex = [
 		255,0,0,255
 	]
@@ -98,7 +102,7 @@ def createPaletteRGBPng(filename):
 
 	pngBuilder3 = PngBuilder(32,32,ColorType.COLORPALLETTE)
 	pngBuilder3.addIDATChunk(test3)
-	pngBuilder3.setPLTEChunk(paletteData)
+	pngBuilder3.setPLTEChunkAndhISTChunk(paletteData,histoData)
 
 	pngBuilder3.settRNSChunk(transparencyIndex)
 	

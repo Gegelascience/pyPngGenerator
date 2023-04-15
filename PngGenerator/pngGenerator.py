@@ -35,12 +35,15 @@ class PngBuilder:
 		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
 
 
-		# PLTE chunk
+		# PLTE chunk init
 		self.__PLTEChunk = None
 		self.__mandatoryPlte = False
 		self.__colorType = colorType
 		if colorType == ColorType.COLORPALLETTE:
 			self.__mandatoryPlte = True
+
+		# self.__hISTChunk init
+		self.__hISTChunk = None
 
 		# tRNS chunk init
 		self.__tRNSChunk = None
@@ -57,7 +60,7 @@ class PngBuilder:
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
 
-		#tIME chunk init
+		# tIME chunk init
 		self.__tIMEChunk = None
 
 		# tEXt chunks init
@@ -93,15 +96,23 @@ class PngBuilder:
 		dataCompress = zlib.compress(data.encode('latin1'))
 		self.__zTXtChunks.append(PngChunkBuilder(u'zTXt',b"".join([keywordAndNullCharBinary, dataCompress])))
 	
-	def setPLTEChunk(self,paletteData:list[tuple]):
-		listEntries = []
+	def setPLTEChunkAndhISTChunk(self,paletteData:list[tuple],histoData: list[int]= []):
+		listEntriesPalette = []
 		if self.__colorType == ColorType.GRAYSCALE or self.__colorType == ColorType.GRAYSCALEALPHA:
 			raise Exception("PLTE invalid with grayscale modes")
 		
-		for entry in paletteData:
-			for color in entry:
-				listEntries.append(struct.pack('>B', color))
-		self.__PLTEChunk = PngChunkBuilder(u'PLTE', b"".join(listEntries))
+		if len(paletteData) > 0:
+			for entry in paletteData:
+				for color in entry:
+					listEntriesPalette.append(struct.pack('>B', color))
+			self.__PLTEChunk = PngChunkBuilder(u'PLTE', b"".join(listEntriesPalette))
+
+		listEntriesHisto = []
+		if len(paletteData) > 0 and len(histoData) > 0:
+			for entry in histoData:
+				listEntriesHisto.append(struct.pack('>H', entry))
+
+			self.__hISTChunk = PngChunkBuilder(u'hIST', b"".join(listEntriesHisto))
 
 	
 	def settRNSChunk(self,chunkData:list):
@@ -160,6 +171,21 @@ class PngBuilder:
 	def removelastzTxtChunk(self):
 		self.__zTXtChunks.pop()	
 
+	def removegAMAChunk(self):
+		self.__gAMAChunk = None
+
+	def removetRNSChunk(self):
+		self.__tRNSChunk = None
+
+	def removebKGDChunk(self):
+		self.__bKGDChunk = None
+
+	def removecHRMChunk(self):
+		self.__cHRMChunk = None
+
+	def removehISTChunk(self):
+		self.__hISTChunk = None
+
 
 	def getFileByteContent(self):
 		byteContentList: list[bytes] = []
@@ -183,6 +209,9 @@ class PngBuilder:
 
 		if self.__mandatoryPlte and not self.__PLTEChunk:
 			raise Exception("PLTE chunk missing")
+		
+		if self.__PLTEChunk and self.__hISTChunk:
+			byteContentList.append(self.__hISTChunk.getBytesContent())
 		
 		if self.__tRNSChunk:
 			byteContentList.append(self.__tRNSChunk.getBytesContent())
