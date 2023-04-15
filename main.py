@@ -31,6 +31,8 @@ def createRGBPng(filename):
 	pngBuilder2.addzTXtChunk(TextKeyword.COMMENT,"Ceci est un commentaire")
 	pngBuilder2.writeFile(filename)
 
+	print(pngBuilder2.getBase64ContentValue())
+
 
 
 def createRGBAPng(filename):

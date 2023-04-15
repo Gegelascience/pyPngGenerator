@@ -3,6 +3,7 @@ import struct
 from datetime import datetime
 from PngGenerator import ColorType, TextKeyword, PhysicalPixelSizeUnit
 import math
+import base64
 
 
 class PngChunkBuilder:
@@ -266,6 +267,10 @@ class PngBuilder:
 		byteContentList.append(self.__IENDChunk.getBytesContent())
 
 		return b"".join(byteContentList)
+
+	def getBase64ContentValue(self):
+		binaryFileContent = self.getFileByteContent()
+		return base64.b64encode(binaryFileContent).decode()
 
 	def writeFile(self,filePath:str):
 		binaryFileContent = self.getFileByteContent()
