@@ -1,4 +1,4 @@
-from PngGenerator import PngBuilder, ColorType, TextKeyword
+from PngGenerator import PngBuilder, ColorType, TextKeyword, PhysicalPixelSizeUnit
 
 def createRGBPng(filename):
 	test2 = []
@@ -24,6 +24,8 @@ def createRGBPng(filename):
 	pngBuilder2.setbKGDChunk([0,0,255])
 
 	pngBuilder2.setcHRMChunk(0,0,0.5,0.5,0.8,0.8,0.2,0.2)
+	pngBuilder2.setpHYsChunk(3,1,PhysicalPixelSizeUnit.METER)
+	pngBuilder2.setsBITChunk([7,7,7])
 
 	pngBuilder2.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder2.addzTXtChunk(TextKeyword.COMMENT,"Ceci est un commentaire")
@@ -57,6 +59,7 @@ def createRGBAPng(filename):
 	pngBuilder.addIDATChunk(test)
 	pngBuilder.setcHRMChunk(0,0,0.5,0.5,0.8,0.8,0.2,0.2)
 	pngBuilder.setgAMAChunk(0.45)
+	pngBuilder.setpHYsChunk(1,1,PhysicalPixelSizeUnit.UNKNOWN)
 	pngBuilder.addtEXtChunk(TextKeyword.AUTHOR,"gegelascience")
 	pngBuilder.addtEXtChunk(TextKeyword.SOFTWARE,"python 3")
 	pngBuilder.writeFile(filename)

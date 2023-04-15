@@ -21,3 +21,8 @@ class TextKeyword(Enum):
 	WARNING = "Warning"
 	SOURCE ="Source"
 	COMMENT = "Comment"
+        
+@unique
+class PhysicalPixelSizeUnit(IntEnum):
+      UNKNOWN = 0
+      METER = 1

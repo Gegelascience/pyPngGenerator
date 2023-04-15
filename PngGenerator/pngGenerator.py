@@ -1,7 +1,7 @@
 import zlib
 import struct
 from datetime import datetime
-from PngGenerator import ColorType, TextKeyword
+from PngGenerator import ColorType, TextKeyword, PhysicalPixelSizeUnit
 import math
 
 
@@ -34,6 +34,7 @@ class PngBuilder:
 		# profondeur 8 bits, rbga (6)
 		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
 
+		self.__bitDepth = 8
 
 		# PLTE chunk init
 		self.__PLTEChunk = None
@@ -56,6 +57,12 @@ class PngBuilder:
 
 		# gAMA chunk init
 		self.__gAMAChunk = None
+
+		# pHYs chunk init
+		self.__pHYsChunk = None
+
+		# sBIT chunk
+		self.__sBITChunk = None
 
 		# IDAT chunks init
 		self.__IDATChunks:list[PngChunkBuilder] = []
@@ -161,6 +168,19 @@ class PngBuilder:
 			raise Exception("Invalid Gamma, must be between 0 and 1")
 		self.__gAMAChunk = PngChunkBuilder(u'gAMA', formatedGamma)
 
+
+	def setpHYsChunk(self, horizontalNbPixel:int, verticalNbPixel:int, unit: PhysicalPixelSizeUnit):
+		self.__pHYsChunk = PngChunkBuilder(u'pHYs',struct.pack('>IIB', horizontalNbPixel,verticalNbPixel,unit))
+
+	def setsBITChunk(self, chunkData:list[int]):
+		listEntries = []
+		for entry in chunkData:
+			if entry > 0 and entry < self.__bitDepth: 
+				listEntries.append(struct.pack('>B', entry))
+			else:
+				raise Exception("Invalid bit depth")
+		self.__sBITChunk = PngChunkBuilder(u'sBIT',b"".join(listEntries))
+
 	
 	def removelastIDATChunk(self):
 		self.__IDATChunks.pop()	
@@ -183,8 +203,19 @@ class PngBuilder:
 	def removecHRMChunk(self):
 		self.__cHRMChunk = None
 
+	def removePLTEChunk(self):
+		self.__PLTEChunk = None
+
 	def removehISTChunk(self):
 		self.__hISTChunk = None
+
+
+	def removesBITChunk(self):
+		self.__sBITChunk = None
+
+	def removepHYsChunk(self):
+		self.__pHYsChunk = None
+
 
 
 	def getFileByteContent(self):
@@ -204,6 +235,9 @@ class PngBuilder:
 		if self.__gAMAChunk:
 			byteContentList.append(self.__gAMAChunk.getBytesContent())
 
+		if self.__sBITChunk:
+			byteContentList.append(self.__sBITChunk.getBytesContent())
+
 		if self.__PLTEChunk:
 			byteContentList.append(self.__PLTEChunk.getBytesContent())
 
@@ -218,6 +252,10 @@ class PngBuilder:
 
 		if self.__bKGDChunk:
 			byteContentList.append(self.__bKGDChunk.getBytesContent())
+
+		if self.__pHYsChunk:
+			byteContentList.append(self.__pHYsChunk.getBytesContent())
+
 
 		byteContentList.extend([iData.getBytesContent() for iData in self.__IDATChunks])
 
