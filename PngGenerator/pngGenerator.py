@@ -1,19 +1,19 @@
 import zlib
 import struct
 from datetime import datetime
-from PngGenerator import ColorType, TextKeyword, PhysicalPixelSizeUnit
+from PngGenerator import ColorType, TextKeyword, PhysicalPixelSizeUnit,PngChunkName
 import math
 import base64
 
 
 class PngChunkBuilder:
 
-	def __init__(self,chunkName:str,data:bytes):
-		self.__chunkType = chunkName.encode("ascii")
-		if chunkName != "IEND":
+	def __init__(self,chunkName:PngChunkName,data:bytes):
+		self.__chunkType = chunkName.value.encode("ascii")
+		if chunkName != PngChunkName.IEND:
 			self.__chunkData = data
 			self.__chunkDataLen = struct.pack('>I', len(data))
-			if chunkName =="PLTE" and len(data)%3 !=0:
+			if chunkName ==PngChunkName.PLTE and len(data)%3 !=0:
 				raise Exception("invalid palette data")
 		else:
 			self.__chunkData= "".encode()
@@ -33,7 +33,7 @@ class PngBuilder:
 		
 		# IDHR
 		# profondeur 8 bits, rbga (6)
-		self.__IDHRChunk = PngChunkBuilder(u'IHDR',struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
+		self.__IDHRChunk = PngChunkBuilder(PngChunkName.IHDR,struct.pack('>IIBBBBB', width, height, 8, colorType, 0, 0, 0))
 
 		self.__bitDepth = 8
 
@@ -78,7 +78,7 @@ class PngBuilder:
 		self.__zTXtChunks:list[PngChunkBuilder] = []
 
 		# IEND chunk
-		self.__IENDChunk=PngChunkBuilder(u'IEND',b"")
+		self.__IENDChunk=PngChunkBuilder(PngChunkName.IEND,b"")
 
 	def addIDATChunk(self,data:list[list[tuple]]):
 		image = []
@@ -93,16 +93,16 @@ class PngBuilder:
 
 		image_compressee = zlib.compress(b"".join(image))
 
-		self.__IDATChunks.append(PngChunkBuilder(u'IDAT',image_compressee))
+		self.__IDATChunks.append(PngChunkBuilder(PngChunkName.IDAT,image_compressee))
 
 
 	def addtEXtChunk(self,keyword:TextKeyword,data:str):
-		self.__tEXtChunks.append(PngChunkBuilder(u'tEXt',struct.pack('>' + str(len(keyword.value)) +  'sB' + str(len(data)) + 's' ,str(keyword.value).encode('latin1'),0,data.encode('latin1'))))
+		self.__tEXtChunks.append(PngChunkBuilder(PngChunkName.tEXt,struct.pack('>' + str(len(keyword.value)) +  'sB' + str(len(data)) + 's' ,str(keyword.value).encode('latin1'),0,data.encode('latin1'))))
 
 	def addzTXtChunk(self,keyword:TextKeyword,data:str):
 		keywordAndNullCharBinary = struct.pack('>' + str(len(keyword.value)) +  'sBB',str(keyword.value).encode('latin1'),0,0)
 		dataCompress = zlib.compress(data.encode('latin1'))
-		self.__zTXtChunks.append(PngChunkBuilder(u'zTXt',b"".join([keywordAndNullCharBinary, dataCompress])))
+		self.__zTXtChunks.append(PngChunkBuilder(PngChunkName.zTXt,b"".join([keywordAndNullCharBinary, dataCompress])))
 	
 	def setPLTEChunkAndhISTChunk(self,paletteData:list[tuple],histoData: list[int]= []):
 		listEntriesPalette = []
@@ -113,14 +113,14 @@ class PngBuilder:
 			for entry in paletteData:
 				for color in entry:
 					listEntriesPalette.append(struct.pack('>B', color))
-			self.__PLTEChunk = PngChunkBuilder(u'PLTE', b"".join(listEntriesPalette))
+			self.__PLTEChunk = PngChunkBuilder(PngChunkName.PLTE, b"".join(listEntriesPalette))
 
 		listEntriesHisto = []
 		if len(paletteData) > 0 and len(histoData) > 0:
 			for entry in histoData:
 				listEntriesHisto.append(struct.pack('>H', entry))
 
-			self.__hISTChunk = PngChunkBuilder(u'hIST', b"".join(listEntriesHisto))
+			self.__hISTChunk = PngChunkBuilder(PngChunkName.hIST, b"".join(listEntriesHisto))
 
 	
 	def settRNSChunk(self,chunkData:list):
@@ -138,7 +138,7 @@ class PngBuilder:
 				listEntries.append(struct.pack('>h', colorTransparency))
 
 
-		self.__tRNSChunk = PngChunkBuilder(u'tRNS', b"".join(listEntries))
+		self.__tRNSChunk = PngChunkBuilder(PngChunkName.tRNS, b"".join(listEntries))
 
 
 	def setbKGDChunk(self,chunkData:list):
@@ -149,7 +149,7 @@ class PngBuilder:
 		else:
 			listEntries.append(struct.pack('>B', chunkData[0]))
 
-		self.__bKGDChunk = PngChunkBuilder(u'bKGD', b"".join(listEntries))
+		self.__bKGDChunk = PngChunkBuilder(PngChunkName.bKGD, b"".join(listEntries))
 
 	def setcHRMChunk(self, xWhite:float,yWhite:float,xRed:float,yRed:float, xGreen:float, yGreen:float, xBlue:float, yBlue:float):
 		listOriginalCoord = [xWhite,yWhite,xRed,yRed, xGreen, yGreen, xBlue, yBlue]
@@ -160,18 +160,18 @@ class PngBuilder:
 			else:
 				raise Exception("Invalid Chromatic Coordonate, must be between 0 and 1")
 			
-		self.__cHRMChunk = PngChunkBuilder(u'cHRM', b"".join(listFormatedCoord))
+		self.__cHRMChunk = PngChunkBuilder(PngChunkName.cHRM, b"".join(listFormatedCoord))
 
 	def setgAMAChunk(self,gamaValue:float):
 		if gamaValue <= 1 and gamaValue >= 0:
 				formatedGamma = struct.pack('>I', math.trunc(gamaValue*100000))
 		else:
 			raise Exception("Invalid Gamma, must be between 0 and 1")
-		self.__gAMAChunk = PngChunkBuilder(u'gAMA', formatedGamma)
+		self.__gAMAChunk = PngChunkBuilder(PngChunkName.gAMA, formatedGamma)
 
 
 	def setpHYsChunk(self, horizontalNbPixel:int, verticalNbPixel:int, unit: PhysicalPixelSizeUnit):
-		self.__pHYsChunk = PngChunkBuilder(u'pHYs',struct.pack('>IIB', horizontalNbPixel,verticalNbPixel,unit))
+		self.__pHYsChunk = PngChunkBuilder(PngChunkName.pHYs,struct.pack('>IIB', horizontalNbPixel,verticalNbPixel,unit))
 
 	def setsBITChunk(self, chunkData:list[int]):
 		listEntries = []
@@ -180,7 +180,7 @@ class PngBuilder:
 				listEntries.append(struct.pack('>B', entry))
 			else:
 				raise Exception("Invalid bit depth")
-		self.__sBITChunk = PngChunkBuilder(u'sBIT',b"".join(listEntries))
+		self.__sBITChunk = PngChunkBuilder(PngChunkName.sBIT,b"".join(listEntries))
 
 	
 	def removelastIDATChunk(self):
@@ -225,7 +225,7 @@ class PngBuilder:
 		now = datetime.now()
 		now.year
 		byteTime = struct.pack('>hBBBBB', now.year,now.month, now.day, now.hour, now.minute, now.second)
-		self.__tIMEChunk = PngChunkBuilder(u'tIME', byteTime)
+		self.__tIMEChunk = PngChunkBuilder(PngChunkName.tIME, byteTime)
 
 		byteContentList.append(self.__magicNumber)
 		byteContentList.append(self.__IDHRChunk.getBytesContent())

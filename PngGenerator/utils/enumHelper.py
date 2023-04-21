@@ -24,5 +24,22 @@ class TextKeyword(Enum):
         
 @unique
 class PhysicalPixelSizeUnit(IntEnum):
-      UNKNOWN = 0
-      METER = 1
+    UNKNOWN = 0
+    METER = 1
+      
+@unique
+class PngChunkName(Enum):
+	IHDR="IHDR"
+	IDAT="IDAT"
+	IEND="IEND"
+	tIME="tIME"
+	tEXt="tEXt"
+	zTXt="zTXt"
+	PLTE="PLTE"
+	hIST="hIST"
+	tRNS="tRNS"
+	bKGD="bKGD"
+	cHRM="cHRM"
+	gAMA="gAMA"
+	pHYs="pHYs"
+	sBIT="sBIT"
