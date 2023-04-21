@@ -32,6 +32,7 @@ def createRGBPng(filename):
 	pngBuilder2.writeFile(filename)
 
 	print(pngBuilder2.getBase64ContentValue())
+	print(pngBuilder2.getBase64ContentValue(True))
 
 
 

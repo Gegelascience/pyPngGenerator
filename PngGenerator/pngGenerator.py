@@ -268,9 +268,10 @@ class PngBuilder:
 
 		return b"".join(byteContentList)
 
-	def getBase64ContentValue(self):
+	def getBase64ContentValue(self, withPrefix:bool=False):
 		binaryFileContent = self.getFileByteContent()
-		return base64.b64encode(binaryFileContent).decode()
+		b64Content = base64.b64encode(binaryFileContent).decode()
+		return b64Content if not withPrefix else "data:text/plain;base64," + b64Content
 
 	def writeFile(self,filePath:str):
 		binaryFileContent = self.getFileByteContent()
