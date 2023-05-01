@@ -1,1 +1,1 @@
-from .test_pngGenerator import PngBuilderTestCase
+from .test_pngGenerator import PngBuilderRGBTestCase
