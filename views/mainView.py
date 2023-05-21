@@ -1,4 +1,4 @@
-from tkinter import Tk, ttk, PhotoImage
+from tkinter import Tk, ttk, PhotoImage,Canvas
 from tkinter.colorchooser import askcolor
 from PngGenerator import PngBuilder, ColorType
 
@@ -29,6 +29,10 @@ def generateIconImg() -> PhotoImage:
 
 	return PhotoImage(data= pngBuilder.getFileByteContent())
 
+def hexaToRGB(hexaValue:str) -> tuple:
+	hVal=hexaValue.lstrip('#')
+	return tuple(int(hVal[i:i+2], 16) for i in (0, 2, 4))
+
 class MyApp(Tk):
 	"""
 	App Class
@@ -37,16 +41,33 @@ class MyApp(Tk):
 		super().__init__()
 		
 		self.title("Png Generator")
-		self.geometry('600x800')
+		self.geometry('1000x900')
 		self.configure(bg='white')
 
 		photo = generateIconImg()
 		self.wm_iconphoto(True,photo)
 
+		self.coloringColor =((255,255,255),'#ffffff')
+
 		# input couleur
-		ttk.Button(self,text="Select color to apply", command=self.switchColor).pack()
+		ttk.Button(self,text="Select color to apply", command=self.switchColor).grid(column=0,row=0)
+		self.colorPreview = Canvas(self,background='#ffffff' , width=50, height=50,highlightthickness=0)
+		self.colorPreview.grid(column=1,row=0)
+		
 
 		# champ de bouton 32x32
+		self.imgPixel = []
+		for i in range(32):
+			line = []
+			for j in range(32):
+				pixel =Canvas(self,background='#000000' , width=20, height=20)
+				pixel.bind("<Button-1>", self.colorCell)
+				pixel.grid(column=j+2,row=i+2)
+				line.append(pixel)
+
+			self.imgPixel.append(line)
+
+		ttk.Button(self,text="generate png", command=self.writePng).grid(column=0,row=35)
 
 		# path input
 		# validate
@@ -54,5 +75,26 @@ class MyApp(Tk):
 
 	def switchColor(self):
 		colors = askcolor(title='Choose a color')
-		print(colors)
+		if colors[0] and colors[1]:
+			self.coloringColor =colors
+			self.colorPreview.configure(bg=colors[1])
 
+
+	def colorCell(self,event):
+		event.widget.configure(bg=self.coloringColor[1])
+
+
+	def writePng(self):
+		dataRGBImg = []
+
+		for line in self.imgPixel:
+			rowRgb = []
+			for pixel in line:
+				rowRgb.append(hexaToRGB(pixel["background"]))
+
+			dataRGBImg.append(rowRgb)
+
+		pngBuilder = PngBuilder(32,32,ColorType.RGB )
+		pngBuilder.addIDATChunk(dataRGBImg)
+
+		pngBuilder.writeFile("test.png")
