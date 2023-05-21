@@ -1,4 +1,4 @@
-from tkinter import Tk, ttk, PhotoImage,Canvas
+from tkinter import Tk, ttk, PhotoImage,Canvas,filedialog
 from tkinter.colorchooser import askcolor
 from PngGenerator import PngBuilder, ColorType
 
@@ -50,9 +50,9 @@ class MyApp(Tk):
 		self.coloringColor =((255,255,255),'#ffffff')
 
 		# input couleur
-		ttk.Button(self,text="Select color to apply", command=self.switchColor).grid(column=0,row=0)
-		self.colorPreview = Canvas(self,background='#ffffff' , width=50, height=50,highlightthickness=0)
-		self.colorPreview.grid(column=1,row=0)
+		ttk.Button(self,text="Select color to apply", command=self.switchColor).grid(column=0,row=0, columnspan=12, sticky="E")
+		self.colorPreview = Canvas(self,background='#ffffff' , width=50, height=50,highlightthickness=1)
+		self.colorPreview.grid(column=12,row=0, columnspan=12)
 		
 
 		# champ de bouton 32x32
@@ -67,7 +67,7 @@ class MyApp(Tk):
 
 			self.imgPixel.append(line)
 
-		ttk.Button(self,text="generate png", command=self.writePng).grid(column=0,row=35)
+		ttk.Button(self,text="generate png", command=self.writePng).grid(column=24,row=0,columnspan=10)
 
 		# path input
 		# validate
@@ -85,16 +85,20 @@ class MyApp(Tk):
 
 
 	def writePng(self):
-		dataRGBImg = []
 
-		for line in self.imgPixel:
-			rowRgb = []
-			for pixel in line:
-				rowRgb.append(hexaToRGB(pixel["background"]))
+		targetFilename = filedialog.asksaveasfilename(filetypes=[("png file","*.png")], defaultextension=".png",initialfile="image.png", title="Generate your picto")
+		if targetFilename:
 
-			dataRGBImg.append(rowRgb)
+			dataRGBImg = []
 
-		pngBuilder = PngBuilder(32,32,ColorType.RGB )
-		pngBuilder.addIDATChunk(dataRGBImg)
+			for line in self.imgPixel:
+				rowRgb = []
+				for pixel in line:
+					rowRgb.append(hexaToRGB(pixel["background"]))
 
-		pngBuilder.writeFile("test.png")
+				dataRGBImg.append(rowRgb)
+
+			pngBuilder = PngBuilder(32,32,ColorType.RGB )
+			pngBuilder.addIDATChunk(dataRGBImg)
+
+			pngBuilder.writeFile(targetFilename)
