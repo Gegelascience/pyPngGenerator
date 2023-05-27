@@ -1,6 +1,6 @@
 from tkinter import Tk, ttk, PhotoImage,Canvas,filedialog
 from tkinter.colorchooser import askcolor
-from PngGenerator import PngBuilder, ColorType
+from PngGenerator import PngBuilder, ColorType, SimpleRGBPngBuilder
 
 def generateIconImg() -> PhotoImage:
 	iconeData= []
@@ -98,7 +98,5 @@ class MyApp(Tk):
 
 				dataRGBImg.append(rowRgb)
 
-			pngBuilder = PngBuilder(32,32,ColorType.RGB )
-			pngBuilder.addIDATChunk(dataRGBImg)
-
+			pngBuilder = SimpleRGBPngBuilder(dataRGBImg,32,32)
 			pngBuilder.writeFile(targetFilename)
