@@ -87,6 +87,14 @@ class PngBuilder:
 			image.append(struct.pack('>B', 0))
 			ligneInt = []
 			for pixel in ligne:
+				if self.__colorType == ColorType.RGB and len(pixel) != 3:
+					raise Exception("Invalid RGB data pixel")
+				elif self.__colorType == ColorType.RGBA and len(pixel) != 4:
+					raise Exception("Invalid RGBA data pixel")
+				elif self.__colorType == ColorType.COLORPALLETTE or self.__colorType == ColorType.GRAYSCALE and len(pixel) != 1:
+					raise Exception("Invalid Grayscale or Palette data pixel")
+				elif self.__colorType == ColorType.GRAYSCALEALPHA and len(pixel) != 2:
+					raise Exception("Invalid Grayscale with alpha data pixel")
 				for color in pixel:
 					ligneInt.append(struct.pack('>B', color))
 			image.extend(ligneInt)
