@@ -1,5 +1,6 @@
 import unittest
 from PngGenerator import PngBuilder, ColorType
+from tkinter import PhotoImage, Tk
 
 class PngBuilderRGBTestCase(unittest.TestCase):
 
@@ -23,3 +24,8 @@ class PngBuilderRGBTestCase(unittest.TestCase):
         
         data=self.photoBuilder.getFileByteContent()
         self.assertEqual(data[0:8], b'\x89PNG\r\n\x1a\n')
+
+    def test_structurePngOK(self):
+        testApp = Tk()
+        testApp.withdraw()
+        PhotoImage(master=testApp,data= self.photoBuilder.getFileByteContent())
