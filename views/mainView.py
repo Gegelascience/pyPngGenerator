@@ -1,6 +1,6 @@
 from tkinter import Tk, ttk, PhotoImage,Canvas,filedialog, messagebox
 from tkinter.colorchooser import askcolor
-from PngGenerator import PngBuilder, ColorType, SimpleRGBPngBuilder
+from PngGenerator import PngBuilder, ColorType, SimpleRGBPngGenerator
 
 def generateIconImg() -> PhotoImage:
 	iconeData= []
@@ -104,6 +104,6 @@ class MyApp(Tk):
 
 				dataRGBImg.append(rowRgb)
 
-			pngBuilder = SimpleRGBPngBuilder(dataRGBImg,32,32)
+			pngBuilder = SimpleRGBPngGenerator(dataRGBImg,32,32)
 			pngBuilder.writeFile(targetFilename)
 			messagebox.showinfo("Picture saved", "The picture at " + targetFilename + " was successfully created")

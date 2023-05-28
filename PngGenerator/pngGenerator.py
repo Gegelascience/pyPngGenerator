@@ -287,7 +287,7 @@ class PngBuilder:
 			pngFile.write(binaryFileContent)
 
 
-class SimplePngBuilderProto:
+class SimplePngGeneratorProto:
 	def __init__(self):
 		self._pngBuilder: PngBuilder
 
@@ -300,7 +300,7 @@ class SimplePngBuilderProto:
 	def writeFile(self,filePath:str):
 		self._pngBuilder.writeFile(filePath)
 
-class SimpleRGBPngBuilder(SimplePngBuilderProto):
+class SimpleRGBPngGenerator(SimplePngGeneratorProto):
 
 	def __init__(self, data:list[list[tuple]],height:int, width:int):
 		super().__init__()
@@ -308,7 +308,7 @@ class SimpleRGBPngBuilder(SimplePngBuilderProto):
 		self._pngBuilder.addIDATChunk(data)
 
 
-class SimpleRGBAPngBuilder(SimplePngBuilderProto):
+class SimpleRGBAPngGenerator(SimplePngGeneratorProto):
 
 	def __init__(self, data:list[list[tuple]],height:int, width:int):
 		super().__init__()

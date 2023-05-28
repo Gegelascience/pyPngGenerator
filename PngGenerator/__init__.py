@@ -1,2 +1,2 @@
 from .utils import ColorType, TextKeyword, PhysicalPixelSizeUnit,PngChunkName
-from .pngGenerator import PngBuilder, SimpleRGBPngBuilder
+from .pngGenerator import PngBuilder, SimpleRGBAPngGenerator, SimpleRGBPngGenerator
