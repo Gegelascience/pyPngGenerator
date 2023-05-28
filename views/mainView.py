@@ -41,7 +41,7 @@ class MyApp(Tk):
 		super().__init__()
 		
 		self.title("Png Generator")
-		self.geometry('1000x900')
+		self.geometry('920x850')
 		self.configure(bg='white')
 
 		photo = generateIconImg()
@@ -49,10 +49,13 @@ class MyApp(Tk):
 
 		self.coloringColor =((255,255,255),'#ffffff')
 
+		ttk.Label(self,text="Enjoy", background='#ffffff').grid(column=0,row=0, columnspan=40,pady=15)
+
 		# input couleur
-		ttk.Button(self,text="Select color to apply", command=self.switchColor).grid(column=0,row=0, columnspan=12, sticky="E")
-		self.colorPreview = Canvas(self,background='#ffffff' , width=50, height=50,highlightthickness=1)
-		self.colorPreview.grid(column=12,row=0, columnspan=12)
+		ttk.Button(self,text="Select color to apply", command=self.switchColor).grid(column=35,row=0, rowspan=5, sticky="S")
+		self.colorPreview = Canvas(self,background='#ffffff' , width=50, height=50,highlightthickness=2)
+		self.colorPreview.grid(column=35,row=5, rowspan=5)
+		ttk.Button(self,text="generate png", command=self.writePng).grid(column=35,row=2,rowspan=22)
 		
 
 		# champ de bouton 32x32
@@ -62,12 +65,15 @@ class MyApp(Tk):
 			for j in range(32):
 				pixel =Canvas(self,background='#000000' , width=20, height=20)
 				pixel.bind("<Button-1>", self.colorCell)
-				pixel.grid(column=j+2,row=i+2)
+				if j == 0:
+					pixel.grid(column=j+2,row=i+2, padx=(10,0))
+				else:
+					pixel.grid(column=j+2,row=i+2)
 				line.append(pixel)
 
 			self.imgPixel.append(line)
 
-		ttk.Button(self,text="generate png", command=self.writePng).grid(column=24,row=0,columnspan=10)
+		
 
 		# path input
 		# validate
