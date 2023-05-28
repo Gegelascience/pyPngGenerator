@@ -1,4 +1,4 @@
-from tkinter import Tk, ttk, PhotoImage,Canvas,filedialog
+from tkinter import Tk, ttk, PhotoImage,Canvas,filedialog, messagebox
 from tkinter.colorchooser import askcolor
 from PngGenerator import PngBuilder, ColorType, SimpleRGBPngBuilder
 
@@ -106,3 +106,4 @@ class MyApp(Tk):
 
 			pngBuilder = SimpleRGBPngBuilder(dataRGBImg,32,32)
 			pngBuilder.writeFile(targetFilename)
+			messagebox.showinfo("Picture saved", "The picture at " + targetFilename + " was successfully created")

@@ -289,20 +289,28 @@ class PngBuilder:
 
 class SimplePngBuilderProto:
 	def __init__(self):
-		self.pngBuilder: PngBuilder
+		self._pngBuilder: PngBuilder
 
 	def getBinaryContent(self) -> bytes:
-		return self.pngBuilder.getFileByteContent()
+		return self._pngBuilder.getFileByteContent()
 	
 	def getBase64Content(self, base64prefix=False) -> str:
-		return self.pngBuilder.getBase64ContentValue(base64prefix)
+		return self._pngBuilder.getBase64ContentValue(base64prefix)
 
 	def writeFile(self,filePath:str):
-		self.pngBuilder.writeFile(filePath)
+		self._pngBuilder.writeFile(filePath)
 
 class SimpleRGBPngBuilder(SimplePngBuilderProto):
 
 	def __init__(self, data:list[list[tuple]],height:int, width:int):
 		super().__init__()
-		self.pngBuilder = PngBuilder(height,width,ColorType.RGB)
-		self.pngBuilder.addIDATChunk(data)
+		self._pngBuilder = PngBuilder(height,width,ColorType.RGB)
+		self._pngBuilder.addIDATChunk(data)
+
+
+class SimpleRGBAPngBuilder(SimplePngBuilderProto):
+
+	def __init__(self, data:list[list[tuple]],height:int, width:int):
+		super().__init__()
+		self._pngBuilder = PngBuilder(height,width,ColorType.RGBA)
+		self._pngBuilder.addIDATChunk(data)
