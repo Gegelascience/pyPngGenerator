@@ -1,7 +1,7 @@
 import zlib
 import struct
 from datetime import datetime
-from PngGenerator import ColorType, TextKeyword, PhysicalPixelSizeUnit,PngChunkName
+from PngGenerator import ColorType, TextKeyword, PhysicalPixelSizeUnit,PngChunkName, PicturePixels
 import math
 import base64
 
@@ -80,12 +80,14 @@ class PngBuilder:
 		# IEND chunk
 		self.__IENDChunk=PngChunkBuilder(PngChunkName.IEND,b"")
 
-	def addIDATChunk(self,data:list[list[tuple]]):
+	def addIDATChunk(self,data:PicturePixels):
 		image = []
 
-		for ligne in data:
+		rows = data.getPixelsForPngBuilder(self.__colorType)
+
+		for row in rows:
 			image.append(struct.pack('>B', 0))
-			ligneInt = []
+			"""ligneInt = []
 			for pixel in ligne:
 				if self.__colorType == ColorType.RGB and len(pixel) != 3:
 					raise Exception("Invalid RGB data pixel")
@@ -97,7 +99,8 @@ class PngBuilder:
 					raise Exception("Invalid Grayscale with alpha data pixel")
 				for color in pixel:
 					ligneInt.append(struct.pack('>B', color))
-			image.extend(ligneInt)
+			image.extend(ligneInt)"""
+			image.extend(row)
 
 		image_compressee = zlib.compress(b"".join(image))
 
@@ -302,7 +305,7 @@ class SimplePngGeneratorProto:
 
 class SimpleRGBPngGenerator(SimplePngGeneratorProto):
 
-	def __init__(self, data:list[list[tuple]],height:int, width:int):
+	def __init__(self, data:PicturePixels,height:int, width:int):
 		super().__init__()
 		self._pngBuilder = PngBuilder(height,width,ColorType.RGB)
 		self._pngBuilder.addIDATChunk(data)
@@ -310,7 +313,7 @@ class SimpleRGBPngGenerator(SimplePngGeneratorProto):
 
 class SimpleRGBAPngGenerator(SimplePngGeneratorProto):
 
-	def __init__(self, data:list[list[tuple]],height:int, width:int):
+	def __init__(self, data:PicturePixels,height:int, width:int):
 		super().__init__()
 		self._pngBuilder = PngBuilder(height,width,ColorType.RGBA)
 		self._pngBuilder.addIDATChunk(data)

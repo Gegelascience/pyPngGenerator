@@ -1,20 +1,20 @@
 import unittest
-from PngGenerator import PngBuilder, ColorType
+from PngGenerator import PngBuilder, ColorType, PicturePixels, Pixel
 from tkinter import PhotoImage, Tk
 
 class PngBuilderRGBTestCase(unittest.TestCase):
 
     def setUp(self) -> None:
-        self.imgData = []
+        self.imgData = PicturePixels()
 
         row =0
         while row < 32:
             col = 0
             rowData = []
             while col < 32:
-                rowData.append([255,255,255])
+                rowData.append(Pixel(255,255,255))
                 col+=1
-            self.imgData.append(rowData)	
+            self.imgData.addRow(rowData)	
             row+=1
 
         self.photoBuilder = PngBuilder(32,32,ColorType.RGB)

@@ -1,9 +1,9 @@
 from tkinter import Tk, ttk, PhotoImage,Canvas,filedialog, messagebox
 from tkinter.colorchooser import askcolor
-from PngGenerator import PngBuilder, ColorType, SimpleRGBPngGenerator
+from PngGenerator import PngBuilder, ColorType, SimpleRGBPngGenerator, PicturePixels, Pixel
 
 def generateIconImg() -> PhotoImage:
-	iconeData= []
+	iconeData= PicturePixels()
 
 	row =0
 	while row < 32:
@@ -12,15 +12,15 @@ def generateIconImg() -> PhotoImage:
 		while col < 32:
 			if row < 16 and col < 16 :
 
-				rowData.append([255,0,0,255])
+				rowData.append(Pixel(255,0,0,255))
 			elif row < 16 and col >= 16:
-				rowData.append([0,255,0,255])
+				rowData.append(Pixel(0,255,0,255))
 			elif row >= 16 and col >= 16:
-				rowData.append([0,0,255,255])
+				rowData.append(Pixel(0,0,255,255))
 			else:
-				rowData.append([255,255,255,255])
+				rowData.append(Pixel(255,255,255,255))
 			col+=1
-		iconeData.append(rowData)	
+		iconeData.addRow(rowData)	
 		row+=1
 
 
@@ -95,14 +95,17 @@ class MyApp(Tk):
 		targetFilename = filedialog.asksaveasfilename(filetypes=[("png file","*.png")], defaultextension=".png",initialfile="image.png", title="Generate your picto")
 		if targetFilename:
 
-			dataRGBImg = []
+			dataRGBImg = PicturePixels()
 
 			for line in self.imgPixel:
 				rowRgb = []
 				for pixel in line:
-					rowRgb.append(hexaToRGB(pixel["background"]))
+					tupleRGB =hexaToRGB(pixel["background"])
+					rowRgb.append(Pixel(tupleRGB[0],tupleRGB[1],tupleRGB[2]))
 
-				dataRGBImg.append(rowRgb)
+				dataRGBImg.addRow(rowRgb)
+
+
 
 			pngBuilder = SimpleRGBPngGenerator(dataRGBImg,32,32)
 			pngBuilder.writeFile(targetFilename)

@@ -1,7 +1,7 @@
-from PngGenerator import PngBuilder, ColorType, TextKeyword, PhysicalPixelSizeUnit
+from PngGenerator import PngBuilder, ColorType, TextKeyword, PhysicalPixelSizeUnit, Pixel, PicturePixels
 
 def createRGBPng(filename):
-	test2 = []
+	test2 = PicturePixels()
 
 	row =0
 	while row < 32:
@@ -10,11 +10,11 @@ def createRGBPng(filename):
 		while col < 32:
 			if row > 2 and row <29 and (col in [4,5,6,25,26,27] or ((col==row or col == row+1 or col == row-1) and col > 3 and col <28)):
 
-				rowData.append([255,255,255])
+				rowData.append(Pixel(255,255,255))
 			else:
-				rowData.append([255,0,0])
+				rowData.append(Pixel(255,0,0))
 			col+=1
-		test2.append(rowData)	
+		test2.addRow(rowData)	
 		row+=1
 
 	pngBuilder2 = PngBuilder(32,32,ColorType.RGB)
@@ -37,7 +37,7 @@ def createRGBPng(filename):
 
 
 def createRGBAPng(filename):
-	test= []
+	test= PicturePixels()
 
 	row =0
 	while row < 32:
@@ -46,15 +46,15 @@ def createRGBAPng(filename):
 		while col < 32:
 			if row < 16 and col < 16 :
 
-				rowData.append([255,0,0,255])
+				rowData.append(Pixel(255,0,0,255))
 			elif row < 16 and col >= 16:
-				rowData.append([0,255,0,255])
+				rowData.append(Pixel(0,255,0,255))
 			elif row >= 16 and col >= 16:
-				rowData.append([0,0,255,255])
+				rowData.append(Pixel(0,0,255,255))
 			else:
-				rowData.append([255,255,255,255])
+				rowData.append(Pixel(255,255,255,255))
 			col+=1
-		test.append(rowData)	
+		test.addRow(rowData)	
 		row+=1
 
 
@@ -70,7 +70,7 @@ def createRGBAPng(filename):
 
 def createPaletteRGBPng(filename):
 
-	test3 = []
+	test3 = PicturePixels()
 
 	paletteData = [
 		(255,0,0),
@@ -94,16 +94,16 @@ def createPaletteRGBPng(filename):
 		while col < 32:
 			if row < 16 and col < 16 :
 
-				rowData.append([0])
+				rowData.append(Pixel(paletteCode=0))
 			elif row < 16 and col >= 16:
-				rowData.append([1])
+				rowData.append(Pixel(paletteCode=1))
 			elif row >= 16 and col >= 16:
-				rowData.append([2])
+				rowData.append(Pixel(paletteCode=2))
 			else:
-				rowData.append([3])
+				rowData.append(Pixel(paletteCode=3))
 
 			col+=1
-		test3.append(rowData)	
+		test3.addRow(rowData)	
 		row+=1
 
 	pngBuilder3 = PngBuilder(32,32,ColorType.COLORPALLETTE)
