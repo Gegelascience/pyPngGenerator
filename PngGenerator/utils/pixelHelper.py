@@ -84,9 +84,9 @@ class PicturePixels:
         return self.__pixelRows
 
     def getPixelsForPngBuilder(self, colorMode: ColorType):
-        listPixels = []
+        listPixels:list[list[bytes]] = []
         for row in self.__pixelRows:
-            rowPlain = []
+            rowPlain:list[bytes] = []
             for pixel in row:
                 rowPlain.extend(pixel.getPixelData(colorMode))
 

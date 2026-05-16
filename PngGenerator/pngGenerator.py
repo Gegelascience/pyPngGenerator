@@ -81,7 +81,7 @@ class PngBuilder:
 		self.__IENDChunk=PngChunkBuilder(PngChunkName.IEND,b"")
 
 	def addIDATChunk(self,data:PicturePixels):
-		image = []
+		image:list[bytes] = []
 
 		rows = data.getPixelsForPngBuilder(self.__colorType)
 
