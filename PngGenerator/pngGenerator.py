@@ -115,8 +115,8 @@ class PngBuilder:
 		dataCompress = zlib.compress(data.encode('latin1'))
 		self.__zTXtChunks.append(PngChunkBuilder(PngChunkName.zTXt,b"".join([keywordAndNullCharBinary, dataCompress])))
 	
-	def setPLTEChunkAndhISTChunk(self,paletteData:list[tuple],histoData: list[int]= []):
-		listEntriesPalette = []
+	def setPLTEChunkAndhISTChunk(self,paletteData:list[tuple[int]],histoData: list[int]= []):
+		listEntriesPalette: list[bytes] = []
 		if self.__colorType == ColorType.GRAYSCALE or self.__colorType == ColorType.GRAYSCALEALPHA:
 			raise Exception("PLTE invalid with grayscale modes")
 		
@@ -126,7 +126,7 @@ class PngBuilder:
 					listEntriesPalette.append(struct.pack('>B', color))
 			self.__PLTEChunk = PngChunkBuilder(PngChunkName.PLTE, b"".join(listEntriesPalette))
 
-		listEntriesHisto = []
+		listEntriesHisto: list[bytes] = []
 		if len(paletteData) > 0 and len(histoData) > 0:
 			for entry in histoData:
 				listEntriesHisto.append(struct.pack('>H', entry))
@@ -134,8 +134,8 @@ class PngBuilder:
 			self.__hISTChunk = PngChunkBuilder(PngChunkName.hIST, b"".join(listEntriesHisto))
 
 	
-	def settRNSChunk(self,chunkData:list):
-		listEntries = []
+	def settRNSChunk(self,chunkData:list[int]):
+		listEntries: list[bytes] = []
 		if self.__colorType == ColorType.GRAYSCALEALPHA or self.__colorType == ColorType.RGBA:
 			raise Exception("tRNS invalid with alpha data in IDAT chunks")
 		
@@ -152,8 +152,8 @@ class PngBuilder:
 		self.__tRNSChunk = PngChunkBuilder(PngChunkName.tRNS, b"".join(listEntries))
 
 
-	def setbKGDChunk(self,chunkData:list):
-		listEntries = []
+	def setbKGDChunk(self,chunkData:list[int]):
+		listEntries: list[bytes] = []
 		if self.__colorType != ColorType.COLORPALLETTE:
 			for entry in chunkData:
 				listEntries.append(struct.pack('>h', entry))
@@ -163,8 +163,8 @@ class PngBuilder:
 		self.__bKGDChunk = PngChunkBuilder(PngChunkName.bKGD, b"".join(listEntries))
 
 	def setcHRMChunk(self, xWhite:float,yWhite:float,xRed:float,yRed:float, xGreen:float, yGreen:float, xBlue:float, yBlue:float):
-		listOriginalCoord = [xWhite,yWhite,xRed,yRed, xGreen, yGreen, xBlue, yBlue]
-		listFormatedCoord = []
+		listOriginalCoord: list[float] = [xWhite,yWhite,xRed,yRed, xGreen, yGreen, xBlue, yBlue]
+		listFormatedCoord: list[bytes] = []
 		for coord in listOriginalCoord:
 			if coord <= 1 and coord >= 0:
 				listFormatedCoord.append(struct.pack('>I', math.trunc(coord*100000)))
@@ -185,7 +185,7 @@ class PngBuilder:
 		self.__pHYsChunk = PngChunkBuilder(PngChunkName.pHYs,struct.pack('>IIB', horizontalNbPixel,verticalNbPixel,unit))
 
 	def setsBITChunk(self, chunkData:list[int]):
-		listEntries = []
+		listEntries: list[bytes] = []
 		for entry in chunkData:
 			if entry > 0 and entry < self.__bitDepth: 
 				listEntries.append(struct.pack('>B', entry))
@@ -297,7 +297,7 @@ class SimplePngGeneratorProto:
 	def getBinaryContent(self) -> bytes:
 		return self._pngBuilder.getFileByteContent()
 	
-	def getBase64Content(self, base64prefix=False) -> str:
+	def getBase64Content(self, base64prefix:bool=False) -> str:
 		return self._pngBuilder.getBase64ContentValue(base64prefix)
 
 	def writeFile(self,filePath:str):
